@@ -1,12 +1,40 @@
 #include "Wifi_server.h"
 #include "Commands.h"
-#include "Test_commands.h"
 #include "Secrets.h"
 
 #include <WiFi.h>
 
-WiFiServer server(SERVER_PORT);
+void connectWiFi()
+{
+    WiFi.begin(WLAN_SSID, WLAN_PASSWORD);
 
+    // Warten, bis die Verbindung steht
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(".");
+
+    }
+
+    // Erfolgsmeldung und zugewiesene IP-Adresse ausgeben
+    Serial.println();
+    Serial.println("WLAN verbunden!");
+    Serial.print("IP-Adresse: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("TCP-Port: ");
+    Serial.println(SERVER_PORT);
+}
+
+
+WiFiClient wlanClient;
+WiFiServer server(SERVER_PORT);
+WiFiClient activeClient;
+
+/**
+ * @brief Startet den WLAN-Access-Point des ESP32.
+ *
+ * Konfiguriert die IP-Adresse und startet den Access Point
+ * mit den in der Konfiguration hinterlegten Zugangsdaten.
+ */
 void startWLAN()
 {
     WiFi.softAPConfig(local_IP, gateway, subnet);
@@ -18,6 +46,12 @@ void startWLAN()
     Serial.println(WiFi.softAPIP());
 }
 
+
+/**
+ * @brief Startet den TCP-Server.
+ *
+ * Der Server lauscht auf dem konfigurierten TCP-Port.
+ */
 void startServer()
 {
     server.begin();
@@ -26,28 +60,41 @@ void startServer()
     Serial.println(SERVER_PORT);
 }
 
+
+/**
+ * @brief Überprüft die TCP-Verbindung und verarbeitet eingehende Befehle.
+ *
+ * Nimmt neue Client-Verbindungen an und leitet empfangene Daten
+ * an die Befehlsverarbeitung weiter.
+ */
 void handleServer()
 {
-    WiFiClient client = server.available();
-
-    if (!client)
+    if (!activeClient || !activeClient.connected())
     {
-        return;
-    }
+        activeClient = server.available();
 
-    Serial.println("Client connected!");
-
-    while (client.connected())
-    {
-        if (client.available())
+        if (activeClient)
         {
-            testCommand(client);
+            Serial.println("Client connected!");
         }
-
-        delay(10);
     }
 
-    client.stop();
+    if (activeClient && activeClient.available())
+    {
+        handleCommand(activeClient);
+    }
+}
 
-    Serial.println("Client disconnected.");
+
+void handleClient()
+{
+    if (!wlanClient || !wlanClient.connected())
+    {
+        wlanClient = server.available();
+    }
+
+    if (wlanClient && wlanClient.available())
+    {
+        handleCommand(wlanClient);
+    }
 }

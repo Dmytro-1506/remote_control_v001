@@ -9,13 +9,27 @@ enum class ButtonColor
     BLUE
 };
 
+/**
+ * @brief Repräsentiert eine Taste mit Entprellung.
+ */
 class Button
 {
 public:
+    /**
+    * @brief Erstellt ein Button-Objekt.
+    *
+    * @param pin GPIO-Pin der Taste.
+    * @param color Farbe der Taste.
+    */
     Button(uint8_t pin, ButtonColor color);
 
     void begin();
 
+    /**
+    * @brief Prüft, ob die Taste gedrückt wurde.
+    *
+    * @return true, wenn eine neue Betätigung erkannt wurde, sonst false.
+    */
     bool wasPressed();
 
 private:

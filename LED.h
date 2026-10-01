@@ -2,6 +2,13 @@
 
 #include <Arduino.h>
 
+
+/**
+ * @brief Steuert eine RGB-LED.
+ *
+ * Ermöglicht das Setzen von RGB-Farben sowie das Ein- und Ausschalten
+ * der LED. Unterstützt außerdem Blink- und Pulseffekte.
+ */
 class LED
 {
 public:
@@ -14,8 +21,16 @@ public:
     void on();
 
     void startBlink(unsigned long interval = 500);
+
     void stopBlink();
-    void update();
+
+    void startPulse(
+    uint8_t r1, uint8_t g1, uint8_t b1,
+    uint8_t r2, uint8_t g2, uint8_t b2);
+
+    void stopPulse();
+
+    void updateEffects();
 
 private:
     uint8_t redPin;
@@ -28,7 +43,26 @@ private:
 
     bool isOn;
     bool blinking;
+    bool pulsing;
+
+    // Farb-Puls
+    float colorPhase;
+    unsigned long lastColor;
+
+    // Helligkeits-Puls
+    float brightnessPhase;
+    unsigned long lastBrightness;
 
     unsigned long blinkInterval;
     unsigned long lastBlink;
+
+    // Erste Farbe
+    uint8_t pulseR1;
+    uint8_t pulseG1;
+    uint8_t pulseB1;
+
+    // Zweite Farbe
+    uint8_t pulseR2;
+    uint8_t pulseG2;
+    uint8_t pulseB2;
 };

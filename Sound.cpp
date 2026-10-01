@@ -1,21 +1,38 @@
 #include "Sound.h"
 
+/**
+ * @brief Erstellt ein Sound-Objekt.
+ *
+ * @param pin GPIO-Pin des Buzzers.
+ */
 Sound::Sound(uint8_t pin)
 {
     this->pin = pin;
 }
 
+
+/**
+ * @brief Initialisiert den GPIO-Pin für die Tonausgabe.
+ */
 void Sound::begin()
 {
     pinMode(pin, OUTPUT);
 }
 
-void Sound::playTone(const unsigned int frequency[], const unsigned int duration[], size_t length)
+
+/**
+ * @brief Spielt eine Folge von Tönen ab.
+ *
+ * @param frequencies Array mit den Frequenzen der Töne in Hertz.
+ * @param durations Array mit den Dauerwerten der Töne in Millisekunden.
+ * @param length Anzahl der abzuspielenden Töne.
+ */
+void Sound::playTone(const unsigned int frequencies[], const unsigned int durations[], size_t length)
 {
     for (size_t i = 0; i < length; i++)
     {
-        tone(pin, frequency[i], duration[i]);
-        delay(duration[i]);
+        tone(pin, frequencies[i], durations[i]);
+        delay(durations[i]);
 
         // Pause zwischen den Tönen
         noTone(pin);
@@ -31,7 +48,7 @@ void Sound::playStart()
         440, 554, 659};
 
     const unsigned int durations[] = {
-        100, 100, 200};
+        100, 100, 300};
 
     playTone(notes, durations, 3);
 }
@@ -39,12 +56,12 @@ void Sound::playStart()
 void Sound::playOK()
 {
     const unsigned int notes[] = {
-        784, 1047};
+        784, 1047, 784, 1047};
 
     const unsigned int durations[] = {
-        100, 180};
+        100, 150, 100, 280};
 
-    playTone(notes, durations, 2);
+    playTone(notes, durations, 4);
 }
 
 void Sound::playFail()
@@ -61,12 +78,12 @@ void Sound::playFail()
 void Sound::playRequest()
 {
     const unsigned int notes[] = {
-        700, 900};
+        700, 900, 700, 900};
 
     const unsigned int durations[] = {
-        100, 100};
+        100, 150, 100, 200};
 
-    playTone(notes, durations, 2);
+    playTone(notes, durations, 4);
 }
 
 void Sound::playReset()
